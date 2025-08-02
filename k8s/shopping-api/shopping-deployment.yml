@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shopping-api
+  labels:
+    app: shopping-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shopping-api
+  template:
+    metadata:
+      labels:
+        app: shopping-api
+    spec:
+      containers:
+        - name: shopping-api
+          image: store/shopping-api:latest
+          imagePullPolicy: Never # to indicate to K8s search image in local, not in docker hub
+          ports:
+            - containerPort: 8082
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: config-map
+                  key: DATABASE_URL
+            - name: DATABASE_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: config-map
+                  key: DATABASE_USER
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: config-map
+                  key: DATABASE_PASSWORD
+            - name: PRODUCT_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: shopping-api-configmap
+                  key: PRODUCT_API_URL
+            - name: USER_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: shopping-api-configmap
+                  key: USER_API_URL
